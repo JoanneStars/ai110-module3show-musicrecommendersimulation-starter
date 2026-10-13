@@ -1,9 +1,12 @@
-🎧 Model Card: Music Recommender Simulation
-1. Model Name
+# 🎧 Model Card: Music Recommender Simulation
+
+## 1. Model Name
 
 VibeMatch Music Recommender 1.0
 
-2. Intended Use
+---
+
+## 2. Intended Use
 
 VibeMatch is a simple music recommendation system designed to recommend songs based on a user's stated music preferences.
 
@@ -11,7 +14,9 @@ The model assumes that a user has preferences for a favorite genre, favorite moo
 
 This project is intended for classroom exploration rather than real-world users. It demonstrates how a recommendation system can use data and scoring rules to rank songs.
 
-3. How the Model Works
+---
+
+## 3. How the Model Works
 
 The recommender compares each song with a user's preferences.
 
@@ -19,116 +24,266 @@ Each song contains information about its genre, mood, energy, tempo, valence, da
 
 The model gives points when a song's genre or mood matches the user's preferences. It also gives similarity points when the song's numerical features are close to the user's target values.
 
-My final scoring experiment reduced the genre weight from 2.0 points to 1.0 point and increased the energy similarity weight from 1.5 points to 3.0 points. This made energy level more important in the final rankings.
+### Final Scoring Rules
+
+- Genre match: +1.0 point
+- Mood match: +1.0 point
+- Energy similarity: up to +3.0 points
+- Valence similarity: up to +1.0 point
+- Danceability similarity: up to +0.5 points
+- Acousticness similarity: up to +0.5 points
+
+My final scoring experiment reduced the genre weight from 2.0 points to 1.0 point and increased the energy similarity weight from 1.5 points to 3.0 points.
+
+This made energy level more important in the final rankings.
 
 After calculating a score for every song, the model sorts the songs from highest score to lowest score and returns the top five recommendations.
 
-4. Data
+---
+
+## 4. Data
 
 The dataset contains 15 songs.
 
-The catalog includes a variety of genres, including:
+The catalog includes a variety of genres including:
 
-Pop
+- Pop
+- Lofi
+- Rock
+- Ambient
+- Jazz
+- Synthwave
+- Indie Pop
+- R&B
+- Metal
+- Folk
+- Hip-Hop
+- Reggae
 
-Lofi
+The dataset also contains different moods including:
 
-Rock
+- Happy
+- Chill
+- Intense
+- Relaxed
+- Moody
+- Focused
+- Romantic
+- Peaceful
+- Confident
 
-Ambient
+I expanded the original dataset from 10 songs to 15 songs by adding:
 
-Jazz
+- Velvet Nights — R&B / romantic
+- Wildfire Heart — metal / intense
+- Golden Fields — folk / peaceful
+- Neon Bounce — hip-hop / confident
+- Ocean Dreams — reggae / relaxed
 
-Synthwave
+The dataset is still very small compared with a real music streaming service. It does not include lyrics, user listening history, skips, playlists, favorite artists, or long-term user behavior.
 
-Indie pop
+---
 
-R&B
+## 5. Strengths
 
-Metal
+The recommender works well when a user's preferences are represented by the available song features.
 
-Folk
+Examples:
 
-Hip-hop
+### High-Energy Pop
 
-Reggae
+The recommender ranked Sunrise City first because it matched the user's preferred genre and mood while also closely matching the numerical target values.
 
-The dataset also contains different moods, including happy, chill, intense, relaxed, moody, focused, romantic, peaceful, and confident.
+### Chill Lofi
 
-I expanded the original dataset from 10 songs to 15 songs by adding five songs:
+The recommender ranked Library Rain and Midnight Coding highly because both songs matched the user's preferred genre, mood, and energy level.
 
-Velvet Nights — R&B / romantic
+### Deep Intense Rock
 
-Wildfire Heart — metal / intense
+The recommender ranked Storm Runner first because it matched the user's rock preference, intense mood preference, and target energy level.
 
-Golden Fields — folk / peaceful
+Another strength is that recommendation explanations are provided for every result. Users can see exactly how each recommendation score was calculated rather than receiving a list of unexplained recommendations.
 
-Neon Bounce — hip-hop / confident
+The system is also deterministic, meaning the same inputs always produce the same outputs.
 
-Ocean Dreams — reggae / relaxed
+---
 
-The dataset is still very small compared with a real music streaming service. It also does not include important information such as lyrics, listening history, skips, playlists, favorite artists, or the user's previous behavior.
+## 6. Limitations and Bias
 
-5. Strengths
+The biggest limitation is the small dataset. With only 15 songs, the recommender cannot represent the wide variety of music available in real-world music services.
 
-The recommender works well when a user's preferences are clearly represented by the available song features.
+The system only uses:
 
-For example, the High-Energy Pop profile ranked Sunrise City highly because it matched the user's pop genre and happy mood while also having similar numerical features.
+- Genre
+- Mood
+- Energy
+- Valence
+- Danceability
+- Acousticness
 
-The Chill Lofi profile produced reasonable recommendations such as Library Rain, Midnight Coding, and Focus Flow because they matched the user's lofi preference and had appropriate energy levels.
+It does not understand:
 
-The Deep Intense Rock profile ranked Storm Runner first because it matched both the rock genre and intense mood and had very high energy.
+- Lyrics
+- Artist style
+- Personal memories
+- Cultural context
+- Listening history
+- Favorite artists
+- Playlist behavior
 
-Another strength is that the explanations show why a song received its score. This makes the recommendations easier to understand than simply displaying a list of song titles.
+### Energy Bias
 
-6. Limitations and Bias
+My weight experiment increased energy importance from 1.5 points to 3.0 points.
 
-The biggest limitation is the small dataset. With only 15 songs, the model has a limited number of choices and cannot represent the full range of music preferences.
+Because of this change, songs with similar energy values may rank highly even when they belong to a different genre.
 
-The model also does not understand lyrics, song meaning, artist style, cultural context, listening history, or personal experiences. It only uses the features included in the dataset.
+Example:
 
-The weight assigned to each feature can also create bias in the recommendations. In my final experiment, energy was given much more importance than genre. This caused high-energy songs from unexpected genres to move higher in the rankings.
+Storm Runner can appear in High-Energy Pop recommendations even though it is a rock song.
 
-For example, Storm Runner could rank highly for a user who prefers high-energy pop even though it is a rock song. This demonstrates how changing the scoring weights can unintentionally favor one feature over another.
+### Dataset Bias
 
-Some genres and moods are also represented by only one song, while other genres such as pop and lofi have multiple songs. This can make the system more likely to recommend certain categories.
+Some genres and moods are represented by only one song while other categories contain multiple songs.
 
-7. Evaluation
+This can make the system more likely to recommend some categories than others.
 
-I evaluated the recommender using three different user profiles:
+### Feature Selection Bias
 
-High-Energy Pop
+The model assumes that the chosen numerical features are sufficient for representing music taste.
 
-Chill Lofi
+In reality, listeners often choose music based on factors that cannot be captured by simple numerical audio features.
 
-Deep Intense Rock
+---
 
-I looked at whether the recommendations made sense based on each profile's genre, mood, and numerical preferences.
+## 7. Evaluation
 
-The results generally matched my expectations. The High-Energy Pop profile ranked Sunrise City first, the Chill Lofi profile ranked Library Rain first, and the Deep Intense Rock profile ranked Storm Runner first.
+I evaluated the recommender using three user profiles:
 
-I also tested a weight-shift experiment. I reduced the genre weight from 2.0 to 1.0 and increased the energy similarity weight from 1.5 to 3.0.
+### High-Energy Pop
 
-This changed the recommendations noticeably. High-energy songs such as Storm Runner and Wildfire Heart became more competitive even when their genre did not match the user's favorite genre.
+Preferences:
 
-I also ran the automated tests for the recommender. The final test run completed successfully with 2 tests passed.
+- Favorite Genre: Pop
+- Favorite Mood: Happy
+- High target energy
 
-8. Future Work
+Result:
 
-If I continued developing this recommender, I would add more songs and more detailed user preferences.
+- Sunrise City ranked first.
 
-I would add tempo as a scoring feature and allow users to specify their preferred tempo range. I would also consider favorite artists, listening history, skips, likes, and playlists.
+### Chill Lofi
 
-Another improvement would be recommendation diversity. Instead of simply returning the five highest-scoring songs, the system could make sure the results are not too similar to one another.
+Preferences:
 
-The explanations could also be improved by clearly identifying the strongest reasons a song was recommended rather than listing every numerical similarity.
+- Favorite Genre: Lofi
+- Favorite Mood: Chill
+- Low target energy
 
-A more advanced version could combine content-based filtering with collaborative filtering. This could allow the system to learn from the behavior of users with similar musical tastes.
+Result:
 
-9. Personal Reflection
+- Library Rain ranked first.
+- Midnight Coding ranked second.
 
-This project taught me that recommendation systems can be created using relatively simple scoring rules. I learned that a recommender takes user preferences and item data, converts them into scores, and then uses those scores to create a ranking.
+### Deep Intense Rock
 
-One of the most interesting things I discovered was how much the recommendations changed when I changed the feature weights. Increasing the importance of energy caused high-energy songs from different genres to appear higher in the results. This helped me understand that the design of a recommendation algorithm can strongly affect what users see.
+Preferences:
 
-I also learned that debugging is an important part of building a program. I had to fix issues involving imports, indentation, variables, and dictionary keys before the program and tests worked correctly. The final result helped me understand how a simple recommendation system works and why real-world recommendation systems need much more data and more sophisticated methods.
+- Favorite Genre: Rock
+- Favorite Mood: Intense
+- Very high target energy
+
+Result:
+
+- Storm Runner ranked first.
+- Wildfire Heart ranked highly.
+
+### Weight Shift Experiment
+
+I reduced genre importance and increased energy importance:
+
+Original:
+
+- Genre = 2.0
+- Energy = 1.5
+
+Modified Version:
+
+- Genre = 1.0
+- Energy = 3.0
+
+Results:
+
+- High-energy songs became much more competitive.
+- Storm Runner ranked highly for users outside the rock genre.
+- Wildfire Heart moved higher in recommendation rankings.
+- Recommendation results became more sensitive to energy preferences.
+
+### Automated Testing
+
+I also validated the implementation using the provided automated tests:
+
+```bash
+python -m pytest
+```
+
+Final result:
+
+```text
+======================
+2 passed
+======================
+```
+
+This confirmed that the object-oriented recommender classes functioned correctly.
+
+---
+
+## 8. Future Work
+
+If I continued this project, I would improve the recommender in several ways.
+
+### Add More Features
+
+Additional features could include:
+
+- Tempo weighting
+- Instrumentalness
+- Speechiness
+- Loudness
+
+### Expand User Profiles
+
+Users could define:
+
+- Multiple favorite genres
+- Multiple moods
+- Favorite artists
+- Listening history
+
+### Improve Recommendation Diversity
+
+Future versions could intentionally avoid recommending songs that are too similar to one another.
+
+### Better Explanations
+
+The recommender could generate natural-language explanations that focus on the strongest reasons for each recommendation.
+
+### Collaborative Filtering
+
+A future version could incorporate collaborative filtering by learning from user behavior patterns and recommending songs liked by users with similar tastes.
+
+---
+
+## 9. Personal Reflection
+
+This project taught me that recommendation systems can be created using relatively simple scoring rules.
+
+My biggest learning experience was seeing how user preferences and feature weights affect recommendation rankings. Small changes to the scoring formula had a noticeable impact on which songs were recommended.
+
+The weight-shift experiment was especially interesting because changing only two weights substantially altered the rankings. Increasing energy importance caused songs from different genres to become more competitive when their energy levels closely matched the user's preferences.
+
+I also learned the importance of testing and debugging. During development I resolved issues involving imports, package structure, variable names, dictionary access, and project configuration. Adding `src/__init__.py` allowed Python to correctly recognize the project structure and run pytest successfully.
+
+Using AI tools helped me explore recommendation system concepts, build scoring logic, generate user profiles, debug errors, and compare experimental results. However, I still needed to manually verify recommendations, test the code, adjust weights, and confirm that the outputs matched my expectations.
+
+Overall, this project helped me better understand how recommendation systems transform user preferences and item features into scores, rankings, and personalized recommendations.

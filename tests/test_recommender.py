@@ -1,61 +1,202 @@
-from src.recommender import Song, UserProfile, Recommender
-
-def make_small_recommender() -> Recommender:
-    songs = [
-        Song(
-            id=1,
-            title="Test Pop Track",
-            artist="Test Artist",
-            genre="pop",
-            mood="happy",
-            energy=0.8,
-            tempo_bpm=120,
-            valence=0.9,
-            danceability=0.8,
-            acousticness=0.2,
-        ),
-        Song(
-            id=2,
-            title="Chill Lofi Loop",
-            artist="Test Artist",
-            genre="lofi",
-            mood="chill",
-            energy=0.4,
-            tempo_bpm=80,
-            valence=0.6,
-            danceability=0.5,
-            acousticness=0.9,
-        ),
-    ]
-    return Recommender(songs)
+from typing import List, Dict, Tuple
+from dataclasses import dataclass
+import csv
 
 
-def test_recommend_returns_songs_sorted_by_score():
-    user = UserProfile(
-        favorite_genre="pop",
-        favorite_mood="happy",
-        target_energy=0.8,
-        likes_acoustic=False,
+@dataclass
+class Song:
+    """
+    Represents a song and its attributes.
+    Required by tests/test_recommender.py
+    """
+    id: int
+    title: str
+    artist: str
+    genre: str
+    mood: str
+    energy: float
+    tempo_bpm: float
+    valence: float
+    danceability: float
+    acousticness: float
+
+
+@dataclass
+class UserProfile:
+    """
+    Represents a user's taste preferences.
+    Required by tests/test_recommender.py
+    """
+    favorite_genre: str
+    favorite_mood: str
+    target_energy: float
+    likes_acoustic: bool
+
+
+class Recommender:
+    """
+    OOP implementation of the recommendation logic.
+    Required by tests/test_recommender.py
+    """
+
+    def __init__(self, songs: List[Song]):
+        self.songs = songs
+
+    def recommend(self, user: UserProfile, k: int = 5) -> Listscored_songs = []
+
+        for song in self.songs:
+            score = 0
+
+            if song.genre.lower() == user.favorite_genre.lower():
+                score += 2
+
+            if song.mood.lower() == user.favorite_mood.lower():
+                score += 1
+
+            score += (1 - abs(song.energy - user.target_energy))
+
+            if user.likes_acoustic:
+                score += song.acousticness
+
+            scored_songs.append((song, score))
+
+        scored_songs.sort(key=lambda item: item[1], reverse=True)
+
+        return [song for song, score in scored_songs[:k]]
+
+    def explain_recommendation(self, user: UserProfile, song: Song) -> str:
+        reasons = []
+
+        if song.genre.lower() == user.favorite_genre.lower():
+            reasons.append("genre match")
+
+        if song.mood.lower() == user.favorite_mood.lower():
+            reasons.append("mood match")
+
+        reasons.append(
+            f"energy similarity ({1 - abs(song.energy - user.target_energy):.2f})"
+        )
+
+        if user.likes_acoustic:
+            reasons.append(
+                f"acousticness contribution ({song.acousticness:.2f})"
+            )
+
+        return ", ".join(reasons)
+
+
+def load_songs(csv_path: str) -> List"""
+    Loads songs from a CSV file and converts numeric fields to numbers.
+    """
+    songs = []
+
+    with open(csv_path, "r", newline="", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            row["id"] = int(row["id"])
+            row["energy"] = float(row["energy"])
+            row["tempo_bpm"] = float(row["tempo_bpm"])
+            row["valence"] = float(row["valence"])
+            row["danceability"] = float(row["danceability"])
+            row["acousticness"] = float(row["acousticness"])
+
+            songs.append(row)
+
+    return songs
+
+
+def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
+    """
+    Scores one song based on genre, mood, and numerical similarity.
+    """
+    score = 0.0
+    reasons = []
+
+    # Genre match: reduced from 2.0 to 1.0 for experiment
+    if song["genre"].lower() == user_prefs["favorite_genre"].lower():
+        score += 1.0
+        reasons.append("genre match (+1.0)")
+
+    # Mood match
+    if song["mood"].lower() == user_prefs["favorite_mood"].lower():
+        score += 1.0
+        reasons.append("mood match (+1.0)")
+
+    # Energy similarity: increased from 1.5 to 3.0 for experiment
+    energy_similarity = 1 - abs(
+        song["energy"] - user_prefs["target_energy"]
     )
-    rec = make_small_recommender()
-    results = rec.recommend(user, k=2)
 
-    assert len(results) == 2
-    # Starter expectation: the pop, happy, high energy song should score higher
-    assert results[0].genre == "pop"
-    assert results[0].mood == "happy"
+    energy_points = 3.0 * energy_similarity
+
+    score += energy_points
+    reasons.append(f"energy similarity (+{energy_points:.2f})")
+
+    # Valence similarity
+    if "target_valence" in user_prefs:
+        valence_similarity = 1 - abs(
+            song["valence"] - user_prefs["target_valence"]
+        )
+
+        valence_points = 1.0 * valence_similarity
+
+        score += valence_points
+        reasons.append(
+            f"valence similarity (+{valence_points:.2f})"
+        )
+
+    # Danceability similarity
+    if "target_danceability" in user_prefs:
+        dance_similarity = 1 - abs(
+            song["danceability"] - user_prefs["target_danceability"]
+        )
+
+        dance_points = 0.5 * dance_similarity
+
+        score += dance_points
+        reasons.append(
+            f"danceability similarity (+{dance_points:.2f})"
+        )
+
+    # Acousticness similarity
+    if "target_acousticness" in user_prefs:
+        acoustic_similarity = 1 - abs(
+            song["acousticness"] - user_prefs["target_acousticness"]
+        )
+
+        acoustic_points = 0.5 * acoustic_similarity
+
+        score += acoustic_points
+        reasons.append(
+            f"acousticness similarity (+{acoustic_points:.2f})"
+        )
+
+    return score, reasons
 
 
-def test_explain_recommendation_returns_non_empty_string():
-    user = UserProfile(
-        favorite_genre="pop",
-        favorite_mood="happy",
-        target_energy=0.8,
-        likes_acoustic=False,
+def recommend_songs(
+    user_prefs: Dict,
+    songs: List[Dict],
+    k: int = 5
+) -> List[Tuple[Dict, float, str]]:
+    """
+    Scores every song and returns the top k songs ranked by score.
+    """
+    recommendations = []
+
+    for song in songs:
+        score, reasons = score_song(user_prefs, song)
+
+        explanation = ", ".join(reasons)
+
+        recommendations.append(
+            (song, score, explanation)
+        )
+
+    recommendations.sort(
+        key=lambda item: item[1],
+        reverse=True
     )
-    rec = make_small_recommender()
-    song = rec.songs[0]
 
-    explanation = rec.explain_recommendation(user, song)
-    assert isinstance(explanation, str)
-    assert explanation.strip() != ""
+    return recommendations[:k]

@@ -1,15 +1,25 @@
-# Byte compiled
+# Python bytecode
 __pycache__/
 *.py[cod]
 *.pyo
 
 # Virtual environments
 .venv/
-env/
-venv/
+  venv/
+ env/
 
-# OS files
+# Pytest
+.pytest_cache/
+
+# macOS
 .DS_Store
 
-# Pytest cache
-.pytest_cache/
+# VS Code
+.vscode/
+
+# Coverage reports
+.coverage
+htmlcov/
+
+# Environment variables
+.env

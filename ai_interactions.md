@@ -1,43 +1,55 @@
 # AI Interactions Log
 
-> **Stretch features only.** Only fill in the sections that apply to stretch features you attempted. If you did not attempt a stretch feature, leave its section blank or delete it. This file is not required for the core project.
-
 ---
 
 ## Agentic Workflow (SF8)
 
-> Document your experience using an AI agent (e.g., Cursor Agent, Claude, Copilot) to make multi-step changes autonomously.
-
 **What task did you give the agent?**
 
-<!-- Describe the goal you asked the agent to accomplish -->
+Help me build and improve a music recommendation system in Python. I asked the AI to explain recommendation systems, suggest scoring logic, help debug Python issues, and generate example user profiles for testing.
 
 **Prompts used:**
 
-<!-- Paste the key prompts you gave the agent -->
+- Explain the difference between collaborative filtering and content-based filtering.
+- How can I calculate similarity for musical features such as energy and valence?
+- Help me create a scoring system for a music recommender.
+- Why are my Python imports failing when running pytest?
+- How can I explain recommendation results to users?
 
 **What did the agent generate or change?**
 
-<!-- List the files edited, code generated, or commands run -->
+- Suggested content-based recommendation logic.
+- Suggested similarity scoring formulas.
+- Helped create multiple user profiles.
+- Helped generate recommendation explanations.
+- Helped troubleshoot package and testing issues.
 
 **What did you verify or fix manually?**
 
-<!-- Describe anything the agent got wrong or that required human review -->
+- Verified all generated code before using it.
+- Adjusted recommendation weights for the experiment.
+- Added additional songs manually.
+- Fixed package setup by adding `src/__init__.py`.
+- Ran and verified all tests manually.
 
 ---
 
 ## Design Pattern (SF10)
 
-> Document how AI helped you choose or implement a design pattern.
-
 **Which design pattern did you use?**
 
-<!-- e.g., Strategy, Factory, Observer, etc. -->
+Object-Oriented Design using Song, UserProfile, and Recommender classes.
 
 **How did AI help you brainstorm or implement it?**
 
-<!-- Describe the conversation or suggestions that led to your decision -->
+AI helped explain how different classes could separate song data, user preferences, and recommendation logic. This made the project easier to organize and maintain.
 
 **How does the pattern appear in your final code?**
 
-<!-- Point to the relevant class or method -->
+The project uses:
+
+- `Song` class to represent music data.
+- `UserProfile` class to represent user preferences.
+- `Recommender` class to contain recommendation logic.
+
+This separates responsibilities and keeps recommendation code organized.

@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple
 from dataclasses import dataclass
 import csv
 
@@ -38,19 +38,55 @@ class Recommender:
     OOP implementation of the recommendation logic.
     Required by tests/test_recommender.py
     """
+
     def __init__(self, songs: List[Song]):
         self.songs = songs
 
-    def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
-        # TODO: Implement recommendation logic
-        return self.songs[:k]
+    def recommend(self, user: UserProfile, k: int = 5) -> List[Song\]:
+        scored_songs = []
+
+        for song in self.songs:
+            score = 0
+
+            if song.genre.lower() == user.favorite_genre.lower():
+                score += 2
+
+            if song.mood.lower() == user.favorite_mood.lower():
+                score += 1
+
+            score += (1 - abs(song.energy - user.target_energy))
+
+            if user.likes_acoustic:
+                score += song.acousticness
+
+            scored_songs.append((song, score))
+
+        scored_songs.sort(key=lambda item: item[1], reverse=True)
+
+        return [song for song, score in scored_songs[:k]]
 
     def explain_recommendation(self, user: UserProfile, song: Song) -> str:
-        # TODO: Implement explanation logic
-        return "Explanation placeholder"
+        reasons = []
+
+        if song.genre.lower() == user.favorite_genre.lower():
+            reasons.append("genre match")
+
+        if song.mood.lower() == user.favorite_mood.lower():
+            reasons.append("mood match")
+
+        reasons.append(
+            f"energy similarity ({1 - abs(song.energy - user.target_energy):.2f})"
+        )
+
+        if user.likes_acoustic:
+            reasons.append(
+                f"acousticness contribution ({song.acousticness:.2f})"
+            )
+
+        return ", ".join(reasons)
 
 
-def load_songs(csv_path: str) -> List[Dict]:
+def load_songs(csv_path: str) -> List[Dict\]:
     """
     Loads songs from a CSV file and converts numeric fields to numbers.
     """
@@ -71,7 +107,8 @@ def load_songs(csv_path: str) -> List[Dict]:
 
     return songs
 
-def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
+
+def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]\]:
     """
     Scores one song based on genre, mood, and numerical similarity.
     """
@@ -92,58 +129,4 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
     energy_similarity = 1 - abs(
         song["energy"] - user_prefs["target_energy"]
     )
-    energy_points = 3.0 * energy_similarity
-    score += energy_points
-    reasons.append(f"energy similarity (+{energy_points:.2f})")
-
-    # Valence similarity
-    if "target_valence" in user_prefs:
-        valence_similarity = 1 - abs(
-            song["valence"] - user_prefs["target_valence"]
-        )
-        valence_points = 1.0 * valence_similarity
-        score += valence_points
-        reasons.append(f"valence similarity (+{valence_points:.2f})")
-
-    # Danceability similarity
-    if "target_danceability" in user_prefs:
-        dance_similarity = 1 - abs(
-            song["danceability"] - user_prefs["target_danceability"]
-        )
-        dance_points = 0.5 * dance_similarity
-        score += dance_points
-        reasons.append(f"danceability similarity (+{dance_points:.2f})")
-
-    # Acousticness similarity
-    if "target_acousticness" in user_prefs:
-        acoustic_similarity = 1 - abs(
-            song["acousticness"] - user_prefs["target_acousticness"]
-        )
-        acoustic_points = 0.5 * acoustic_similarity
-        score += acoustic_points
-        reasons.append(f"acousticness similarity (+{acoustic_points:.2f})")
-
-    return score, reasons
-
-def recommend_songs(
-    user_prefs: Dict,
-    songs: List[Dict],
-    k: int = 5
-) -> List[Tuple[Dict, float, str]]:
-    """
-    Scores every song and returns the top k songs ranked by score.
-    """
-    recommendations = []
-
-    for song in songs:
-        score, reasons = score_song(user_prefs, song)
-        explanation = ", ".join(reasons)
-
-        recommendations.append((song, score, explanation))
-
-    recommendations.sort(key=lambda item: item[1], reverse=True)
-
-    return recommendations[:k]
-
-
-    
+  energy_points = 3.0 * energy_similarity
