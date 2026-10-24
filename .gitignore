@@ -1,4 +1,4 @@
-# Byte compiled
+# Python bytecode
 __pycache__/
 *.py[cod]
 *.pyo
@@ -8,8 +8,22 @@ __pycache__/
 env/
 venv/
 
-# OS files
+# Operating system files
 .DS_Store
+Thumbs.db
 
 # Pytest cache
 .pytest_cache/
+
+# Python tooling
+.mypy_cache/
+.ruff_cache/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Editor settings
+.vscode/
+.idea/
